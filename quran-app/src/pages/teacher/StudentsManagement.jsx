@@ -1,13 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { Plus, Upload, ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Eye } from 'lucide-react'
 import { toPersianDigits } from '../../components/layout/Header.jsx'
 import { mockClasses, mockStudentsList } from '../../lib/teacherMockData.js'
 
+// معلم فقط نقش نظارتی دارد؛ افزودن/حذف دانش‌آموز و ورود گروهی CSV فقط از پنل مدیر انجام می‌شود.
 export default function StudentsManagement() {
   const [searchParams, setSearchParams] = useSearchParams()
   const classFilter = searchParams.get('class') || 'all'
-  const [showImportInfo, setShowImportInfo] = useState(false)
 
   const filteredStudents = useMemo(
     () =>
@@ -23,33 +23,18 @@ export default function StudentsManagement() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-bold text-xl text-ink">دانش‌آموزان</h1>
-          <p className="text-sm text-ink-soft mt-1">مدیریت و مشاهدهٔ پیشرفت دانش‌آموزان</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowImportInfo((v) => !v)} className="btn-secondary flex items-center gap-1.5 !py-2.5">
-            <Upload size={16} /> ورود گروهی CSV
-          </button>
-          <button className="btn-primary flex items-center gap-1.5 !py-2.5">
-            <Plus size={16} /> افزودن دانش‌آموز
-          </button>
-        </div>
+      <div>
+        <h1 className="font-bold text-xl text-ink">دانش‌آموزان</h1>
+        <p className="text-sm text-ink-soft mt-1">مشاهدهٔ نظارتی پیشرفت دانش‌آموزان</p>
       </div>
 
-      {showImportInfo && (
-        <div className="card-surface p-4 text-sm text-ink-soft leading-6">
-          فایل CSV باید ستون‌های <code className="text-emerald-700">full_name</code>،{' '}
-          <code className="text-emerald-700">student_code</code> و{' '}
-          <code className="text-emerald-700">parent_phone</code> را داشته باشد. پس از انتخاب فایل،
-          دانش‌آموزان به‌صورت گروهی به کلاس انتخاب‌شده اضافه می‌شوند.
-          <br />
-          <span className="text-xs text-ink-faint">
-            (این بخش در پرامپت مربوط به Edge Function و اتصال کامل به Supabase Storage تکمیل می‌شود.)
-          </span>
-        </div>
-      )}
+      <div className="card-surface p-4 flex items-start gap-2.5 text-sm text-ink-soft leading-6">
+        <Eye size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+        <span>
+          افزودن دانش‌آموز جدید یا ورود گروهی از فایل CSV فقط توسط <b>مدیر سامانه</b> انجام می‌شود.
+          این صفحه فقط برای مشاهده و نظارت بر پیشرفت دانش‌آموزان کلاس‌های شماست.
+        </span>
+      </div>
 
       {/* فیلتر کلاس */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">

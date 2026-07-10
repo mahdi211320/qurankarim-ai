@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
-import { Plus, Search, Trash2, Pencil, X } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
+import { Plus, Search, Trash2, Pencil, X, Upload, Download, CheckCircle2, XCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Papa from 'papaparse'
 import { toPersianDigits } from '../../components/layout/Header.jsx'
-import { mockUsers as initialUsers } from '../../lib/adminMockData.js'
+import { mockUsers as initialUsers, mockAdminClasses } from '../../lib/adminMockData.js'
+import { bulkImportStudents } from '../../lib/api.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
 const ROLE_TABS = [
@@ -17,6 +19,10 @@ export default function UserManagement() {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(new Set())
   const [modalOpen, setModalOpen] = useState(false)
+  const [importClassId, setImportClassId] = useState(mockAdminClasses[0]?.id || '')
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState(null)
+  const fileInputRef = useRef(null)
   const { showToast } = useToast()
 
   const filtered = useMemo(
@@ -52,6 +58,63 @@ export default function UserManagement() {
     showToast(`«${newUser.full_name}» با موفقیت افزوده شد.`)
   }
 
+  function downloadSampleCsv() {
+    const sample = [
+      ['full_name', 'national_id', 'student_code', 'parent_phone'],
+      ['محمدرضا احمدی', '0071234567', '70101', '09121234567'],
+      ['علی حسینی', '0071234568', '70102', '']
+    ]
+    const csv = sample.map((r) => r.join(',')).join('\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'نمونه-ورود-دانش‌آموزان.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function handleFileSelected(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !importClassId) return
+
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const rows = results.data
+          .map((r) => ({
+            full_name: (r.full_name || '').trim(),
+            national_id: (r.national_id || '').trim(),
+            student_code: (r.student_code || '').trim(),
+            parent_phone: (r.parent_phone || '').trim() || null
+          }))
+          .filter((r) => r.full_name && r.national_id && r.student_code)
+
+        if (rows.length === 0) {
+          showToast('فایل خالی است یا ستون‌های لازم را ندارد.', 'error')
+          return
+        }
+
+        setImporting(true)
+        setImportResult(null)
+        const { data, error } = await bulkImportStudents(importClassId, rows)
+        setImporting(false)
+
+        if (error || !data) {
+          showToast('ورود گروهی ناموفق بود. اتصال Supabase را بررسی کنید.', 'error')
+          return
+        }
+
+        setImportResult(data)
+        if (data.created_count > 0) showToast(`${toPersianDigits(data.created_count)} دانش‌آموز اضافه شد.`)
+        if (data.failed.length > 0) showToast(`${toPersianDigits(data.failed.length)} ردیف با خطا مواجه شد.`, 'error')
+      },
+      error: () => showToast('خواندن فایل CSV ناموفق بود.', 'error')
+    })
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -80,6 +143,64 @@ export default function UserManagement() {
           </button>
         ))}
       </div>
+
+      {/* ورود گروهی دانش‌آموزان با CSV — فقط ادمین، برای هر کلاس جداگانه */}
+      {activeRole === 'student' && (
+        <div className="card-surface p-4 flex flex-col gap-3">
+          <p className="text-sm font-semibold text-ink">ورود گروهی دانش‌آموزان یک کلاس</p>
+          <p className="text-xs text-ink-soft leading-6">
+            فایل CSV باید ستون‌های <code className="text-emerald-700">full_name</code>،{' '}
+            <code className="text-emerald-700">national_id</code> (کد ملی — نام کاربری ورود)،{' '}
+            <code className="text-emerald-700">student_code</code> (کد دانش‌آموزی — رمز عبور پیش‌فرض) و{' '}
+            <code className="text-emerald-700">parent_phone</code> (اختیاری) داشته باشد. این کار را برای هر
+            کلاس جداگانه (مثلاً هر ۱۲ بار) تکرار کنید.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={importClassId}
+              onChange={(e) => setImportClassId(e.target.value)}
+              className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            >
+              {mockAdminClasses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.class_name}
+                </option>
+              ))}
+            </select>
+
+            <input ref={fileInputRef} type="file" accept=".csv" onChange={handleFileSelected} className="hidden" />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+              className="btn-primary flex items-center gap-1.5 !py-2.5 disabled:opacity-60"
+            >
+              <Upload size={16} /> {importing ? 'در حال ورود...' : 'انتخاب فایل CSV'}
+            </button>
+            <button onClick={downloadSampleCsv} className="flex items-center gap-1.5 text-emerald-600 font-semibold text-xs">
+              <Download size={14} /> دانلود نمونه
+            </button>
+          </div>
+
+          {importResult && (
+            <div className="border-t border-paper-soft pt-3">
+              <p className="flex items-center gap-1.5 text-sm text-emerald-600 mb-2">
+                <CheckCircle2 size={15} /> {toPersianDigits(importResult.created_count)} دانش‌آموز با موفقیت اضافه شد
+              </p>
+              {importResult.failed.length > 0 && (
+                <ul className="flex flex-col gap-1.5">
+                  {importResult.failed.map((f, i) => (
+                    <li key={i} className="flex items-center gap-1.5 text-xs text-red-600">
+                      <XCircle size={13} className="shrink-0" />
+                      کد ملی {toPersianDigits(f.national_id)}: {f.reason}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* جستجو */}
       <div className="relative">

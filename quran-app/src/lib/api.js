@@ -3,7 +3,11 @@ import { supabase } from './supabaseClient.js'
 // لایهٔ یکپارچهٔ فراخوانی Edge Functionها. هر تابع همیشه شکل
 // { data, error } را برمی‌گرداند تا کامپوننت‌ها مجبور به try/catch پراکنده نباشند.
 
-const DEFAULT_RETRIES = 1
+const DEFAULT_RETRIES = 2
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 async function invokeWithRetry(functionName, body, retries = DEFAULT_RETRIES) {
   let lastError = null
@@ -13,11 +17,15 @@ async function invokeWithRetry(functionName, body, retries = DEFAULT_RETRIES) {
       const { data, error } = await supabase.functions.invoke(functionName, { body })
       if (error) {
         lastError = error
+        // مکث کوتاه و فزاینده قبل از تلاش بعدی؛ برای خطاهای موقت مثل محدودیت نرخ
+        // درخواست (rate limit) وقتی چند دانش‌آموز هم‌زمان درخواست می‌فرستند مفید است
+        if (attempt < retries) await wait(700 * (attempt + 1))
         continue
       }
       return { data, error: null }
     } catch (err) {
       lastError = err
+      if (attempt < retries) await wait(700 * (attempt + 1))
     }
   }
 
@@ -77,4 +85,13 @@ export async function previewCleanup() {
 /** اجرای واقعی پاک‌سازی هوشمند (فقط ادمین) */
 export async function runCleanup() {
   return invokeWithRetry('storage-manager', { action: 'cleanup' })
+}
+
+/**
+ * ورود گروهی دانش‌آموزان از فهرست پارس‌شدهٔ CSV (فقط معلمِ صاحب کلاس یا ادمین).
+ * @param {string} classId
+ * @param {{ full_name: string, national_id: string, student_code: string, parent_phone?: string }[]} students
+ */
+export async function bulkImportStudents(classId, students) {
+  return invokeWithRetry('bulk-import-students', { class_id: classId, students })
 }

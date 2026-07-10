@@ -26,6 +26,7 @@ supabase functions deploy generate-quiz
 supabase functions deploy grade-quiz
 supabase functions deploy process-recitation
 supabase functions deploy storage-manager
+supabase functions deploy bulk-import-students
 ```
 
 جزئیات بیشتر دربارهٔ سیاست دسترسی باکت Storage در `supabase/functions/README.md` آمده است.

@@ -6,6 +6,7 @@ import CircularProgress from '../components/lessons/CircularProgress.jsx'
 import { toPersianDigits } from '../components/layout/Header.jsx'
 import { mockLessons, mockStudent, getLessonById } from '../lib/mockData.js'
 import { generateQuiz, gradeQuiz } from '../lib/api.js'
+import { fetchLessonContent } from '../lib/lessonsApi.js'
 import { generateMockQuiz, stripAnswers, gradeMockQuiz } from '../lib/mockQuiz.js'
 
 export default function QuizPage() {
@@ -26,11 +27,18 @@ export default function QuizPage() {
 
     async function load() {
       setPhase('loading')
-      const { data, error } = await generateQuiz(lesson.id, mockStudent.id)
+
+      // آزمون واقعی فقط وقتی ممکن است که این درس واقعاً در دیتابیس ثبت شده باشد
+      // (یعنی شناسهٔ UUID واقعی داشته باشد، نه فقط در mockData تعریف شده باشد)
+      const { data: realLesson } = await fetchLessonContent(lesson.grade_level, lesson.lesson_number)
+      const dbId = realLesson?.dbId
+
+      const { data, error } = dbId ? await generateQuiz(dbId, mockStudent.id) : { data: null, error: true }
 
       if (!cancelled) {
         if (error || !data) {
-          // Edge Function واقعی هنوز دیپلوی/پیکربندی نشده؛ از تولیدکنندهٔ محلی استفاده می‌شود
+          // Edge Function واقعی هنوز دیپلوی/پیکربندی نشده یا این درس هنوز در دیتابیس ثبت نشده؛
+          // از تولیدکنندهٔ محلی استفاده می‌شود
           const mock = generateMockQuiz(lesson)
           mockQuestionsRef.current = mock.questions
           setQuestions(stripAnswers(mock.questions))

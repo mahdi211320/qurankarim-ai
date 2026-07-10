@@ -45,6 +45,20 @@ with check (
 | `grade-quiz` | `{ quiz_id, student_answers }` | تصحیح خودکار (MCQ محلی، تشریحی با GPT-4o) |
 | `process-recitation` | `{ audio_path, lesson_id, student_id }` | رونویسی با Whisper + محاسبهٔ شباهت |
 | `storage-manager` | `{ action: 'usage' \| 'cleanup-preview' \| 'cleanup' }` | فقط ادمین؛ گزارش و پاک‌سازی فضا |
+| `bulk-import-students` | `{ class_id, students: [{ full_name, national_id, student_code, parent_phone? }] }` | فقط معلمِ صاحبِ کلاس یا ادمین؛ ساخت حساب واقعی برای هر دانش‌آموز |
+
+## ورود دانش‌آموزان بدون ایمیل
+
+چون دانش‌آموزان معمولاً ایمیل شخصی ندارند، نام کاربری ورود آن‌ها **کد ملی** است
+(یکتا و همیشگی) و رمز عبور پیش‌فرض **کد دانش‌آموزی** است. `bulk-import-students`
+برای هر کد ملی یک ایمیل داخلی به‌صورت `{national_id}@students.quranapp.internal`
+می‌سازد (کاربر هرگز آن را نمی‌بیند). این دامنه در دو جا باید یکسان بماند:
+`supabase/functions/bulk-import-students/index.ts` (ثابت `EMAIL_DOMAIN`) و
+`src/pages/auth/Login.jsx` (ثابت `STUDENT_EMAIL_DOMAIN`).
+
+⚠️ توصیه: در آینده امکان تغییر رمز عبور توسط خودِ دانش‌آموز اضافه شود تا امنیت بهتری داشته باشد.
+پیش از استفاده، حتماً مایگریشن `0003_add_national_id.sql` را اجرا کنید (ستون `national_id`
+را به جدول `students` اضافه می‌کند).
 
 ## تست محلی
 

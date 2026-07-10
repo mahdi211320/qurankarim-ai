@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
@@ -15,6 +15,7 @@ import {
   getLessonById,
   getNextLesson
 } from '../lib/mockData.js'
+import { fetchLessonContent } from '../lib/lessonsApi.js'
 
 const TAB_KEYS = { QURAN: 'quran', ACT1: 'act1', ACT2: 'act2', ACT3: 'act3' }
 
@@ -22,8 +23,26 @@ export default function LessonDetail() {
   const { lessonId } = useParams()
   const navigate = useNavigate()
 
-  const lesson = useMemo(() => getLessonById(mockLessons, lessonId), [lessonId])
-  const nextLesson = lesson ? getNextLesson(mockLessons, lesson) : null
+  const baseLesson = useMemo(() => getLessonById(mockLessons, lessonId), [lessonId])
+  const nextLesson = baseLesson ? getNextLesson(mockLessons, baseLesson) : null
+
+  // محتوای واقعی (متن قرآن/فعالیت‌ها/صوت) در صورت وجود در دیتابیس، جایگزین محتوای
+  // نمونهٔ mockData می‌شود؛ در نبود بک‌اند واقعی، همان مقادیر mock باقی می‌مانند.
+  const [content, setContent] = useState(baseLesson)
+
+  useEffect(() => {
+    setContent(baseLesson)
+    if (!baseLesson) return
+    let cancelled = false
+    fetchLessonContent(baseLesson.grade_level, baseLesson.lesson_number).then(({ data }) => {
+      if (!cancelled && data && data.verses.length > 0) {
+        setContent((prev) => ({ ...prev, ...data, id: prev?.id ?? data.id }))
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [baseLesson])
 
   const [activeTab, setActiveTab] = useState(TAB_KEYS.QURAN)
   const [progress, setProgress] = useState(
@@ -40,7 +59,7 @@ export default function LessonDetail() {
   const [isBookmarked, setIsBookmarked] = useState(() => mockBookmarks.has(lessonId))
   const [justUnlocked, setJustUnlocked] = useState(false)
 
-  if (!lesson) {
+  if (!baseLesson || !content) {
     return (
       <div className="px-5 pt-6 text-center">
         <p className="text-ink-soft">درسی با این شناسه پیدا نشد.</p>
@@ -50,6 +69,8 @@ export default function LessonDetail() {
       </div>
     )
   }
+
+  const lesson = content
 
   const allDone = progress.act1_done && progress.act2_done && progress.act3_done
 
@@ -124,7 +145,7 @@ export default function LessonDetail() {
         <AnimatePresence mode="wait">
           {activeTab === TAB_KEYS.QURAN && (
             <motion.div key="quran" {...fadeProps} className="flex flex-col gap-4">
-              <AudioPlayer />
+              <AudioPlayer src={lesson.audioUrl} />
               {lesson.verses.length > 0 ? (
                 <div className="card-surface p-5 flex flex-col gap-5">
                   {lesson.verses.map((verse, i) => (
@@ -172,7 +193,7 @@ export default function LessonDetail() {
                 </div>
               )}
               <RecitationRecorder
-                lessonId={lesson.id}
+                lessonId={lesson.dbId}
                 onComplete={(res) => markDone('act2_done', { recitation_score: res.score })}
               />
             </motion.div>

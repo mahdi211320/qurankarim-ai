@@ -2,6 +2,27 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 
+// پیام‌های واقعی Supabase Auth را به فارسیِ دقیق (نه یک حدس ثابت) برمی‌گرداند
+function translateAuthError(message) {
+  const msg = (message || '').toLowerCase()
+  if (msg.includes('already registered') || msg.includes('already exists')) {
+    return 'این ایمیل قبلاً ثبت شده است. اگر حساب دارید، از صفحهٔ ورود استفاده کنید.'
+  }
+  if (msg.includes('password')) {
+    return `رمز عبور مورد قبول نیست: ${message}`
+  }
+  if (msg.includes('invalid') && msg.includes('email')) {
+    return 'فرمت ایمیل معتبر نیست.'
+  }
+  if (msg.includes('signups not allowed') || msg.includes('signup is disabled')) {
+    return 'ثبت‌نام در تنظیمات Supabase غیرفعال است (Authentication → Providers → Email → Allow new users to sign up).'
+  }
+  if (msg.includes('rate limit')) {
+    return 'تعداد درخواست‌ها زیاد بوده؛ کمی صبر کنید و دوباره تلاش کنید.'
+  }
+  return `ثبت‌نام ناموفق بود: ${message || 'خطای نامشخص'}`
+}
+
 export default function Signup() {
   const { signUp } = useAuth()
   const navigate = useNavigate()
@@ -24,7 +45,7 @@ export default function Signup() {
     const { error } = await signUp({ email, password, fullName, role })
     setLoading(false)
     if (error) {
-      setError('ثبت‌نام ناموفق بود. ممکن است این ایمیل قبلاً ثبت شده باشد.')
+      setError(translateAuthError(error.message))
       return
     }
     setSuccess(true)
