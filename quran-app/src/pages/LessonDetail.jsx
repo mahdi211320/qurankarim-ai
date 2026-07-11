@@ -16,12 +16,15 @@ import {
   getNextLesson
 } from '../lib/mockData.js'
 import { fetchLessonContent } from '../lib/lessonsApi.js'
+import { fetchStudentProgress, upsertStudentProgress } from '../lib/progressApi.js'
+import { useAuth } from '../context/AuthContext.jsx'
 
 const TAB_KEYS = { QURAN: 'quran', ACT1: 'act1', ACT2: 'act2', ACT3: 'act3' }
 
 export default function LessonDetail() {
   const { lessonId } = useParams()
   const navigate = useNavigate()
+  const { studentRecord } = useAuth()
 
   const baseLesson = useMemo(() => getLessonById(mockLessons, lessonId), [lessonId])
   const nextLesson = baseLesson ? getNextLesson(mockLessons, baseLesson) : null
@@ -56,6 +59,30 @@ export default function LessonDetail() {
         is_completed: false
       }
   )
+
+  // اگر هم درس واقعاً در دیتابیس ثبت شده باشد (dbId موجود) و هم کاربر یک
+  // دانش‌آموز واقعی وارد شده باشد، پیشرفت واقعی او از Supabase واکشی و جایگزین
+  // مقدار نمونهٔ اولیه می‌شود تا بین بازدیدها/دستگاه‌ها حفظ شود.
+  useEffect(() => {
+    if (!content?.dbId || !studentRecord?.id) return
+    let cancelled = false
+    fetchStudentProgress(studentRecord.id, content.dbId).then(({ data }) => {
+      if (!cancelled && data) {
+        setProgress({
+          act1_done: data.act1_done,
+          act2_done: data.act2_done,
+          act3_done: data.act3_done,
+          quiz_score: data.quiz_score,
+          recitation_score: data.recitation_score,
+          is_completed: data.status === 'completed'
+        })
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [content?.dbId, studentRecord?.id])
+
   const [isBookmarked, setIsBookmarked] = useState(() => mockBookmarks.has(lessonId))
   const [justUnlocked, setJustUnlocked] = useState(false)
 
@@ -80,12 +107,19 @@ export default function LessonDetail() {
       const willBeComplete = next.act1_done && next.act2_done && next.act3_done
       if (willBeComplete && !prev.is_completed) {
         next.is_completed = true
-        // TODO: در نسخهٔ نهایی این‌جا student_progress در Supabase به‌روزرسانی می‌شود
-        // (تریگر sync_progress_status در دیتابیس status و completed_at را خودکار می‌سازد)
         celebrate()
       }
       return next
     })
+
+    // ثبت واقعی در Supabase (فقط اگر هم درس و هم دانش‌آموز شناسهٔ واقعی داشته باشند).
+    // در نبود این پیش‌نیازها (مثلاً حالت دمو یا درسی که هنوز محتوایش وارد نشده)،
+    // به‌طور خاموش نادیده گرفته می‌شود؛ state محلی بالا همچنان تجربهٔ کاربر را حفظ می‌کند.
+    if (studentRecord?.id && lesson.dbId) {
+      upsertStudentProgress(studentRecord.id, lesson.dbId, { [key]: true, ...extra }).then(({ error }) => {
+        if (error) console.warn('ثبت پیشرفت در سرور ناموفق بود:', error)
+      })
+    }
   }
 
   function celebrate() {

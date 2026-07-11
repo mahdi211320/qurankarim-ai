@@ -15,6 +15,7 @@ const DEMO_PROFILES = {
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
+  const [studentRecord, setStudentRecord] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isDemo, setIsDemo] = useState(false)
 
@@ -41,6 +42,7 @@ export function AuthProvider({ children }) {
       if (newSession) fetchProfile(newSession.user.id)
       else {
         setProfile(null)
+        setStudentRecord(null)
         setLoading(false)
       }
     })
@@ -51,6 +53,19 @@ export function AuthProvider({ children }) {
   async function fetchProfile(userId) {
     const { data } = await supabase.from('profiles').select('id, role, full_name').eq('id', userId).single()
     setProfile(data ?? null)
+
+    // برای دانش‌آموزان، ردیف واقعی جدول students (شامل UUID لازم برای ثبت پیشرفت) نیز واکشی می‌شود
+    if (data?.role === 'student') {
+      const { data: studentRow } = await supabase
+        .from('students')
+        .select('id, class_id, student_code, national_id')
+        .eq('profile_id', userId)
+        .maybeSingle()
+      setStudentRecord(studentRow ?? null)
+    } else {
+      setStudentRecord(null)
+    }
+
     setLoading(false)
   }
 
@@ -79,12 +94,14 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(DEMO_STORAGE_KEY)
       setIsDemo(false)
       setProfile(null)
+      setStudentRecord(null)
       return
     }
     await supabase.auth.signOut()
+    setStudentRecord(null)
   }
 
-  const value = { session, profile, loading, isDemo, signIn, signUp, signInDemo, signOut }
+  const value = { session, profile, studentRecord, loading, isDemo, signIn, signUp, signInDemo, signOut }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 

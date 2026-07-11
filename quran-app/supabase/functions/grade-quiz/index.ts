@@ -90,14 +90,14 @@ ${shortAnswerJobs
       return errorResponse('ثبت نتیجهٔ آزمون با خطا مواجه شد.', 500, updateQuizError)
     }
 
-    if (finalScore >= 70) {
-      // فرض بر این است که ردیف student_progress قبلاً هنگام تکمیل فعالیت‌های ۱ تا ۳ ساخته شده است
-      await supabase
-        .from('student_progress')
-        .update({ quiz_score: finalScore })
-        .eq('student_id', quiz.student_id)
-        .eq('lesson_id', quiz.lesson_id)
-    }
+    // نمرهٔ آزمون همیشه ثبت می‌شود (نه فقط در صورت قبولی)؛ upsert چون ممکن است این
+    // اولین فعالیتی باشد که برای این درس ثبت می‌شود
+    await supabase
+      .from('student_progress')
+      .upsert(
+        { student_id: quiz.student_id, lesson_id: quiz.lesson_id, quiz_score: finalScore },
+        { onConflict: 'student_id,lesson_id' }
+      )
 
     return jsonResponse({ final_score: finalScore, results })
   } catch (err) {

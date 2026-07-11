@@ -1,10 +1,10 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Plus, Search, Trash2, Pencil, X, Upload, Download, CheckCircle2, XCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Papa from 'papaparse'
 import { toPersianDigits } from '../../components/layout/Header.jsx'
 import { mockUsers as initialUsers, mockAdminClasses } from '../../lib/adminMockData.js'
-import { bulkImportStudents } from '../../lib/api.js'
+import { bulkImportStudents, listAdminUsers, createAdminUser, deleteAdminUser } from '../../lib/api.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
 const ROLE_TABS = [
@@ -15,6 +15,8 @@ const ROLE_TABS = [
 
 export default function UserManagement() {
   const [users, setUsers] = useState(initialUsers)
+  const [isRealData, setIsRealData] = useState(false)
+  const [loadingUsers, setLoadingUsers] = useState(false)
   const [activeRole, setActiveRole] = useState('student')
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(new Set())
@@ -24,6 +26,24 @@ export default function UserManagement() {
   const [importResult, setImportResult] = useState(null)
   const fileInputRef = useRef(null)
   const { showToast } = useToast()
+
+  // در بارگذاری هر تب نقش، فهرست واقعی کاربران از Supabase واکشی می‌شود.
+  // در نبود بک‌اند واقعی، همان لیست نمونهٔ محلی به‌عنوان fallback باقی می‌ماند.
+  useEffect(() => {
+    let cancelled = false
+    setLoadingUsers(true)
+    listAdminUsers(activeRole).then(({ data, error }) => {
+      if (cancelled) return
+      setLoadingUsers(false)
+      if (!error && data?.users) {
+        setIsRealData(true)
+        setUsers((prev) => [...prev.filter((u) => u.role !== activeRole), ...data.users])
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [activeRole])
 
   const filtered = useMemo(
     () =>
@@ -41,20 +61,54 @@ export default function UserManagement() {
     })
   }
 
-  function bulkDelete() {
+  async function removeUsers(ids) {
+    for (const id of ids) {
+      if (isRealData) {
+        const { error } = await deleteAdminUser(id)
+        if (error) {
+          showToast(`حذف یکی از کاربران ناموفق بود.`, 'error')
+          continue
+        }
+      }
+      setUsers((prev) => prev.filter((u) => u.id !== id))
+    }
+  }
+
+  async function bulkDelete() {
     const count = selected.size
-    setUsers((prev) => prev.filter((u) => !selected.has(u.id)))
+    await removeUsers([...selected])
     setSelected(new Set())
     showToast(`${toPersianDigits(count)} کاربر حذف شد.`, 'error')
   }
 
-  function deleteUser(id) {
-    setUsers((prev) => prev.filter((u) => u.id !== id))
+  async function deleteUser(id) {
+    await removeUsers([id])
     showToast('کاربر حذف شد.', 'error')
   }
 
-  function addUser(newUser) {
-    setUsers((prev) => [...prev, { id: `u_new_${prev.length + 1}`, ...newUser }])
+  async function addUser(newUser) {
+    if (!isRealData) {
+      // بدون بک‌اند واقعی، فقط به‌صورت محلی/نمایشی اضافه می‌شود
+      setUsers((prev) => [...prev, { id: `u_new_${prev.length + 1}`, ...newUser }])
+      showToast(`«${newUser.full_name}» فقط به‌صورت محلی اضافه شد (Supabase وصل نیست).`, 'error')
+      return
+    }
+
+    const { data, error } = await createAdminUser(newUser)
+    if (error || !data) {
+      showToast('ساخت کاربر واقعی ناموفق بود.', 'error')
+      return
+    }
+    setUsers((prev) => [
+      ...prev,
+      {
+        id: data.id,
+        full_name: newUser.full_name,
+        role: newUser.role,
+        code: newUser.student_code || '—',
+        email: newUser.email || '—'
+      }
+    ])
     showToast(`«${newUser.full_name}» با موفقیت افزوده شد.`)
   }
 
@@ -120,7 +174,12 @@ export default function UserManagement() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-bold text-xl text-ink">کاربران</h1>
-          <p className="text-sm text-ink-soft mt-1">مدیریت دانش‌آموزان، معلم‌ها و مدیران سامانه</p>
+          <p className="text-sm text-ink-soft mt-1">
+            مدیریت دانش‌آموزان، معلم‌ها و مدیران سامانه
+            {!loadingUsers && !isRealData && (
+              <span className="text-gold-600"> — نمایش داده‌های نمونه (Supabase وصل نیست)</span>
+            )}
+          </p>
         </div>
         <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-1.5 !py-2.5">
           <Plus size={16} /> افزودن کاربر
@@ -290,19 +349,32 @@ export default function UserManagement() {
 function AddUserModal({ open, onClose, onAdd, defaultRole }) {
   const [fullName, setFullName] = useState('')
   const [role, setRole] = useState(defaultRole)
-  const [identifier, setIdentifier] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [nationalId, setNationalId] = useState('')
+  const [studentCode, setStudentCode] = useState('')
+  const [classId, setClassId] = useState(mockAdminClasses[0]?.id || '')
+  const [saving, setSaving] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     if (!fullName.trim()) return
-    onAdd({
+    setSaving(true)
+    await onAdd({
       full_name: fullName.trim(),
       role,
-      code: role === 'student' ? identifier || '—' : '—',
-      email: role !== 'student' ? identifier || '—' : '—'
+      email: role !== 'student' ? email.trim() : undefined,
+      password: role !== 'student' ? password : undefined,
+      national_id: role === 'student' ? nationalId.trim() : undefined,
+      student_code: role === 'student' ? studentCode.trim() : undefined,
+      class_id: role === 'student' ? classId : undefined
     })
+    setSaving(false)
     setFullName('')
-    setIdentifier('')
+    setEmail('')
+    setPassword('')
+    setNationalId('')
+    setStudentCode('')
     onClose()
   }
 
@@ -354,17 +426,69 @@ function AddUserModal({ open, onClose, onAdd, defaultRole }) {
               </select>
             </label>
 
-            <label className="flex flex-col gap-1.5 text-sm">
-              {role === 'student' ? 'کد دانش‌آموزی' : 'ایمیل'}
-              <input
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
-                className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              />
-            </label>
+            {role === 'student' ? (
+              <>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  کد ملی (نام کاربری ورود)
+                  <input
+                    value={nationalId}
+                    onChange={(e) => setNationalId(e.target.value)}
+                    required
+                    className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  کد دانش‌آموزی (رمز عبور پیش‌فرض)
+                  <input
+                    value={studentCode}
+                    onChange={(e) => setStudentCode(e.target.value)}
+                    required
+                    className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  کلاس
+                  <select
+                    value={classId}
+                    onChange={(e) => setClassId(e.target.value)}
+                    className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  >
+                    {mockAdminClasses.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.class_name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </>
+            ) : (
+              <>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  ایمیل
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5 text-sm">
+                  رمز عبور اولیه
+                  <input
+                    type="text"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </label>
+              </>
+            )}
 
-            <button type="submit" className="btn-primary mt-2">
-              افزودن
+            <button type="submit" disabled={saving} className="btn-primary mt-2 disabled:opacity-60">
+              {saving ? 'در حال افزودن...' : 'افزودن'}
             </button>
           </motion.form>
         </motion.div>

@@ -46,6 +46,7 @@ with check (
 | `process-recitation` | `{ audio_path, lesson_id, student_id }` | رونویسی با Whisper + محاسبهٔ شباهت |
 | `storage-manager` | `{ action: 'usage' \| 'cleanup-preview' \| 'cleanup' }` | فقط ادمین؛ گزارش و پاک‌سازی فضا |
 | `bulk-import-students` | `{ class_id, students: [{ full_name, national_id, student_code, parent_phone? }] }` | فقط معلمِ صاحبِ کلاس یا ادمین؛ ساخت حساب واقعی برای هر دانش‌آموز |
+| `admin-manage-users` | `{ action: 'list' \| 'create' \| 'delete', ... }` | فقط ادمین؛ فهرست/افزودن/حذف واقعی کاربران |
 
 ## ورود دانش‌آموزان بدون ایمیل
 

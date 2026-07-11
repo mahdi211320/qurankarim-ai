@@ -78,12 +78,14 @@ Deno.serve(async (req) => {
       return errorResponse('ذخیرهٔ نتیجهٔ تلاوت با خطا مواجه شد.', 500, insertError)
     }
 
-    // به‌روزرسانی امتیاز تلاوت در پیشرفت درس (ردیف باید از قبل با act2_done وجود داشته باشد)
+    // ثبت/به‌روزرسانی امتیاز تلاوت در پیشرفت درس (upsert، چون ممکن است این
+    // اولین فعالیتی باشد که دانش‌آموز برای این درس انجام می‌دهد)
     await supabase
       .from('student_progress')
-      .update({ act2_done: true, recitation_score: similarityScore })
-      .eq('student_id', student_id)
-      .eq('lesson_id', lesson_id)
+      .upsert(
+        { student_id, lesson_id, act2_done: true, recitation_score: similarityScore },
+        { onConflict: 'student_id,lesson_id' }
+      )
 
     return jsonResponse({ similarity_score: similarityScore, feedback, transcript })
   } catch (err) {

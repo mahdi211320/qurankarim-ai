@@ -95,3 +95,18 @@ export async function runCleanup() {
 export async function bulkImportStudents(classId, students) {
   return invokeWithRetry('bulk-import-students', { class_id: classId, students })
 }
+
+/** فهرست واقعی کاربران یک نقش (فقط ادمین) */
+export async function listAdminUsers(role) {
+  return invokeWithRetry('admin-manage-users', { action: 'list', role })
+}
+
+/** ساخت واقعی یک کاربر جدید (دانش‌آموز/معلم/مدیر) - فقط ادمین */
+export async function createAdminUser(payload) {
+  return invokeWithRetry('admin-manage-users', { action: 'create', ...payload })
+}
+
+/** حذف واقعی یک کاربر (و همهٔ داده‌های وابسته، به‌خاطر cascade) - فقط ادمین */
+export async function deleteAdminUser(userId) {
+  return invokeWithRetry('admin-manage-users', { action: 'delete', user_id: userId })
+}
