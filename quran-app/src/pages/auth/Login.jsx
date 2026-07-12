@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { BookMarked, GraduationCap, School, ShieldCheck } from 'lucide-react'
+import { BookMarked } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 // باید دقیقاً با EMAIL_DOMAIN در supabase/functions/bulk-import-students/index.ts یکسان باشد
 const STUDENT_EMAIL_DOMAIN = 'students.quranapp.internal'
 
 export default function Login() {
-  const { signIn, signInDemo } = useAuth()
+  const { signIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [mode, setMode] = useState('staff') // 'staff' | 'student'
-  const [identifier, setIdentifier] = useState('') // ایمیل (معلم/مدیر) یا کد دانش‌آموزی
+  const [identifier, setIdentifier] = useState('') // ایمیل (معلم/مدیر) یا کد ملی (دانش‌آموز)
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -30,11 +30,6 @@ export default function Login() {
       return
     }
     navigate(redirectTo, { replace: true })
-  }
-
-  function handleDemo(role) {
-    signInDemo(role)
-    navigate(role === 'teacher' ? '/teacher' : role === 'admin' ? '/admin' : '/', { replace: true })
   }
 
   function switchMode(next) {
@@ -119,30 +114,7 @@ export default function Login() {
             </p>
           )}
         </form>
-
-        <div className="flex flex-col gap-2">
-          <p className="text-[11px] text-ink-faint text-center">
-            یا برای پیش‌نمایش سریع بدون نیاز به حساب واقعی:
-          </p>
-          <div className="grid grid-cols-3 gap-2">
-            <DemoButton icon={GraduationCap} label="دانش‌آموز" onClick={() => handleDemo('student')} />
-            <DemoButton icon={School} label="معلم" onClick={() => handleDemo('teacher')} />
-            <DemoButton icon={ShieldCheck} label="مدیر" onClick={() => handleDemo('admin')} />
-          </div>
-        </div>
       </div>
     </div>
-  )
-}
-
-function DemoButton({ icon: Icon, label, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="card-surface p-3 flex flex-col items-center gap-1.5 text-ink-soft active:bg-paper-soft"
-    >
-      <Icon size={18} />
-      <span className="text-[11px] font-medium">{label}</span>
-    </button>
   )
 }
