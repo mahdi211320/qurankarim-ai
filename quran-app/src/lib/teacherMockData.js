@@ -1,4 +1,4 @@
-import { mockLessons, computeLessonStatus } from './mockData.js'
+import { mockLessons, computeLessonStatus, getTermLimit } from './mockData.js'
 
 // داده‌های نمونه برای پنل معلم - هم‌ساختار با جداول Supabase (classes / students / ...)
 // در نسخهٔ نهایی همه از Supabase با فیلتر teacher_id واکشی می‌شوند.
@@ -11,20 +11,29 @@ export const mockTeacher = {
 }
 
 export const mockClasses = [
-  { id: 'c1', class_name: 'هفتم - الف', grade_level: 7, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'AB12CD' },
-  { id: 'c2', class_name: 'هشتم - ب', grade_level: 8, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'XY34ZT' },
-  { id: 'c3', class_name: 'نهم - الف', grade_level: 9, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'QW56ER' }
+  { id: '701', class_name: 'هفتم ۱', grade_level: 7, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q7T1XA' },
+  { id: '702', class_name: 'هفتم ۲', grade_level: 7, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q7T2XB' },
+  { id: '703', class_name: 'هفتم ۳', grade_level: 7, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q7T3XC' },
+  { id: '704', class_name: 'هفتم ۴', grade_level: 7, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q7T4XD' },
+  { id: '801', class_name: 'هشتم ۱', grade_level: 8, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q8T1YA' },
+  { id: '802', class_name: 'هشتم ۲', grade_level: 8, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q8T2YB' },
+  { id: '803', class_name: 'هشتم ۳', grade_level: 8, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q8T3YC' },
+  { id: '804', class_name: 'هشتم ۴', grade_level: 8, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q8T4YD' },
+  { id: '901', class_name: 'نهم ۱', grade_level: 9, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q9T1ZA' },
+  { id: '902', class_name: 'نهم ۲', grade_level: 9, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q9T2ZB' },
+  { id: '903', class_name: 'نهم ۳', grade_level: 9, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q9T3ZC' },
+  { id: '904', class_name: 'نهم ۴', grade_level: 9, academic_year: '۱۴۰۴-۱۴۰۵', access_code: 'Q9T4ZD' }
 ]
 
 export const mockStudentsList = [
-  { id: 'st1', full_name: 'محمدرضا احمدی', student_code: '70234', class_id: 'c1', progress_percent: 100, last_activity: '۲ ساعت پیش', recitation_avg: 88, quiz_avg: 90 },
-  { id: 'st2', full_name: 'علی حسینی', student_code: '70235', class_id: 'c1', progress_percent: 67, last_activity: 'دیروز', recitation_avg: 74, quiz_avg: 80 },
-  { id: 'st3', full_name: 'امیرحسین کریمی', student_code: '70236', class_id: 'c1', progress_percent: 33, last_activity: '۳ روز پیش', recitation_avg: 65, quiz_avg: 70 },
-  { id: 'st4', full_name: 'سارا محمدی', student_code: '80112', class_id: 'c2', progress_percent: 83, last_activity: '۱ ساعت پیش', recitation_avg: 91, quiz_avg: 85 },
-  { id: 'st5', full_name: 'فاطمه رضایی', student_code: '80113', class_id: 'c2', progress_percent: 50, last_activity: 'دیروز', recitation_avg: 78, quiz_avg: 72 },
-  { id: 'st6', full_name: 'زهرا نوری', student_code: '80114', class_id: 'c2', progress_percent: 17, last_activity: '۵ روز پیش', recitation_avg: 60, quiz_avg: 55 },
-  { id: 'st7', full_name: 'یاسمن قاسمی', student_code: '90045', class_id: 'c3', progress_percent: 100, last_activity: 'امروز', recitation_avg: 95, quiz_avg: 93 },
-  { id: 'st8', full_name: 'نگار صادقی', student_code: '90046', class_id: 'c3', progress_percent: 60, last_activity: '۲ روز پیش', recitation_avg: 82, quiz_avg: 79 }
+  { id: 'st1', full_name: 'محمدرضا احمدی', student_code: '70234', class_id: '701', progress_percent: 100, last_activity: '۲ ساعت پیش', recitation_avg: 88, quiz_avg: 90 },
+  { id: 'st2', full_name: 'علی حسینی', student_code: '70235', class_id: '701', progress_percent: 67, last_activity: 'دیروز', recitation_avg: 74, quiz_avg: 80 },
+  { id: 'st3', full_name: 'امیرحسین کریمی', student_code: '70236', class_id: '702', progress_percent: 33, last_activity: '۳ روز پیش', recitation_avg: 65, quiz_avg: 70 },
+  { id: 'st4', full_name: 'سارا محمدی', student_code: '80112', class_id: '801', progress_percent: 83, last_activity: '۱ ساعت پیش', recitation_avg: 91, quiz_avg: 85 },
+  { id: 'st5', full_name: 'فاطمه رضایی', student_code: '80113', class_id: '801', progress_percent: 50, last_activity: 'دیروز', recitation_avg: 78, quiz_avg: 72 },
+  { id: 'st6', full_name: 'زهرا نوری', student_code: '80114', class_id: '802', progress_percent: 17, last_activity: '۵ روز پیش', recitation_avg: 60, quiz_avg: 55 },
+  { id: 'st7', full_name: 'یاسمن قاسمی', student_code: '90045', class_id: '901', progress_percent: 100, last_activity: 'امروز', recitation_avg: 95, quiz_avg: 93 },
+  { id: 'st8', full_name: 'نگار صادقی', student_code: '90046', class_id: '901', progress_percent: 60, last_activity: '۲ روز پیش', recitation_avg: 82, quiz_avg: 79 }
 ]
 
 export const mockRecentActivity = [
@@ -32,7 +41,7 @@ export const mockRecentActivity = [
   { id: 'a2', studentName: 'محمدرضا احمدی', action: 'تلاوت درس ۲ را ثبت کرد', time: '۲ ساعت پیش' },
   { id: 'a3', studentName: 'سارا محمدی', action: 'فعالیت ۱ درس ۳ را تکمیل کرد', time: '۳ ساعت پیش' },
   { id: 'a4', studentName: 'علی حسینی', action: 'درس ۲ را شروع کرد', time: 'دیروز' },
-  { id: 'a5', studentName: 'زهرا نوری', action: 'به کلاس «هشتم - ب» پیوست', time: '۲ روز پیش' }
+  { id: 'a5', studentName: 'زهرا نوری', action: 'به کلاس «هشتم ۲» پیوست', time: '۲ روز پیش' }
 ]
 
 export function getClassById(classId) {
@@ -78,8 +87,10 @@ export function getStudentProgressHistory(studentId) {
 
 export function getStudentLessonStatus(student) {
   const progressMap = {}
-  const doneCount = Math.round((student.progress_percent / 100) * 6)
-  const lessonsForGrade = mockLessons.filter((l) => l.grade_level === getGradeFromClass(student.class_id))
+  const gradeLevel = getGradeFromClass(student.class_id)
+  const termLimit = getTermLimit(gradeLevel)
+  const doneCount = Math.round((student.progress_percent / 100) * termLimit)
+  const lessonsForGrade = mockLessons.filter((l) => l.grade_level === gradeLevel)
   lessonsForGrade
     .sort((a, b) => a.lesson_number - b.lesson_number)
     .forEach((lesson, i) => {
@@ -92,7 +103,6 @@ export function getStudentLessonStatus(student) {
         recitation_score: i < doneCount ? student.recitation_avg : null
       }
     })
-  const gradeLevel = getGradeFromClass(student.class_id)
   return computeLessonStatus(lessonsForGrade, progressMap, gradeLevel)
 }
 
@@ -103,7 +113,8 @@ function getGradeFromClass(classId) {
 export function getStudentAudioRecordings(studentId) {
   const student = getStudentById(studentId)
   if (!student) return []
-  const doneCount = Math.round((student.progress_percent / 100) * 6)
+  const termLimit = getTermLimit(getGradeFromClass(student.class_id))
+  const doneCount = Math.round((student.progress_percent / 100) * termLimit)
   return Array.from({ length: doneCount }, (_, i) => ({
     id: `${studentId}_audio_${i + 1}`,
     lessonTitle: `درس ${i + 1}`,

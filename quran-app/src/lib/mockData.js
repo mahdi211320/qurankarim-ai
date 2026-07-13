@@ -105,6 +105,14 @@ export const mockLessons = [
     dailyReading: ''
   },
 
+  // پایه هفتم - ترم دوم (دروس ۷ تا ۱۲) - کتاب هفتم جمعاً ۱۲ درس دارد
+  { id: 'l7_7', grade_level: 7, lesson_number: 7, title: 'قرآن که پیام آسمانی است، روشنگر راه زندگانی است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_8', grade_level: 7, lesson_number: 8, title: 'ندایی در زمین و آسمان است که این دنیا برای امتحان است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_9', grade_level: 7, lesson_number: 9, title: 'اگر مشتاق دیدار خدایی، عمل شایسته‌تر تا می‌توانی', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_10', grade_level: 7, lesson_number: 10, title: 'این خانه با نماز و دعا خو گرفته است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_11', grade_level: 7, lesson_number: 11, title: 'چو یونس از خدا باید طلب کرد', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_12', grade_level: 7, lesson_number: 12, title: 'ولایت خدا بود تو را نصیر و رهنما', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+
   // پایه هشتم - ترم اول (دروس ۱ تا ۶) - عناوین مطابق فهرست کتاب رسمی
   { id: 'l8_1', grade_level: 8, lesson_number: 1, title: 'رستگاری در صلاة است و زکات', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
   { id: 'l8_2', grade_level: 8, lesson_number: 2, title: 'باد و خاک و آب و آتش بنده‌اند', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
@@ -113,12 +121,28 @@ export const mockLessons = [
   { id: 'l8_5', grade_level: 8, lesson_number: 5, title: 'ای وارث پیمبر و قرآن و دین بیا', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
   { id: 'l8_6', grade_level: 8, lesson_number: 6, title: 'معبودهای باطل چون تار عنکبوت‌اند', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
 
+  // پایه هشتم - ترم دوم (دروس ۷ تا ۱۲) - کتاب هشتم جمعاً ۱۲ درس دارد
+  { id: 'l8_7', grade_level: 8, lesson_number: 7, title: 'هر روزِ عمر مشق کن این شعر ناب را', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_8', grade_level: 8, lesson_number: 8, title: 'راهرو گر صد هنر دارد، توکل بایدش', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_9', grade_level: 8, lesson_number: 9, title: 'کدام دانه فرو رفت در زمین که نرست؟', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_10', grade_level: 8, lesson_number: 10, title: 'دستور خدا، سلام برتوست', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_11', grade_level: 8, lesson_number: 11, title: 'همنشین تو از تو به باشد', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_12', grade_level: 8, lesson_number: 12, title: 'یا غافر الخطایا! دریاب بی‌نوا را', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+
   // پایه نهم - ترم اول (دروس ۱ تا ۵)
   { id: 'l9_1', grade_level: 9, lesson_number: 1, title: 'این جهان راه است و ما راهی', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
   { id: 'l9_2', grade_level: 9, lesson_number: 2, title: 'روشنگر راه سعادت چو خورشید فروزان است قرآن', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
   { id: 'l9_3', grade_level: 9, lesson_number: 3, title: 'در صراط مستقیم ای دل کسی گمراه نیست', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
   { id: 'l9_4', grade_level: 9, lesson_number: 4, title: 'یک میوه از درخت غرور، آن تمسخر است', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_5', grade_level: 9, lesson_number: 5, title: 'بهشتِ حق، جزای متقین است', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' }
+  { id: 'l9_5', grade_level: 9, lesson_number: 5, title: 'بهشتِ حق، جزای متقین است', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+
+  // پایه نهم - ترم دوم (دروس ۶ تا ۱۱) - کتاب نهم جمعاً ۱۱ درس دارد
+  { id: 'l9_6', grade_level: 9, lesson_number: 6, title: 'عدالت‌خواه و عادل چون خدا باش', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_7', grade_level: 9, lesson_number: 7, title: 'خدا با حکمت و میزان، رسولان را دهد یاری', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_8', grade_level: 9, lesson_number: 8, title: 'تجارت با خدا، کسبی است پرسود', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_9', grade_level: 9, lesson_number: 9, title: 'سفر زندگی ما ز خدا تا به خداست', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_10', grade_level: 9, lesson_number: 10, title: 'رتل القرآن ترتیلاً، ندای رحمت است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_11', grade_level: 9, lesson_number: 11, title: 'به آسمان و کوه‌ها چرا نظر نمی‌کنی؟!', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' }
 ]
 
 // نشان‌شده‌ها (bookmarks) - نمونه: درس ۱ نشان‌شده است

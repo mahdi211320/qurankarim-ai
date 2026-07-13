@@ -59,6 +59,6 @@ export function getOverviewCounts() {
 // کلاس‌ها به همراه معلم مسئول (برای مدیریت کلاس‌ها در پنل ادمین)
 export const mockAdminClasses = teacherClasses.map((c) => ({
   ...c,
-  teacherName: c.id === 'c2' ? 'آقای موسوی' : 'خانم رضایی',
+  teacherName: c.grade_level === 8 ? 'آقای موسوی' : 'خانم رضایی',
   ...getClassStats(c.id)
 }))

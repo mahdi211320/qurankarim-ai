@@ -5,10 +5,13 @@
 
 export function generateMockQuiz(lesson) {
   const act1 = lesson.activities?.act1
+  const act2 = lesson.activities?.act2
   const act3 = lesson.activities?.act3
-  const verse = lesson.verses?.[0]
+  const verses = lesson.verses || []
+  const verse = verses[0]
+  const verse2 = verses[1]
 
-  const questions = [
+  const mcqQuestions = [
     {
       type: 'mcq',
       question: `درس «${lesson.title}» دربارهٔ کدام موضوع است؟`,
@@ -27,6 +30,21 @@ export function generateMockQuiz(lesson) {
       options: ['تلاوت و تمرین قرائت', 'حل مسئلهٔ ریاضی', 'نگارش انشا', 'ورزش'],
       answer: 'تلاوت و تمرین قرائت'
     },
+    verse2 && {
+      type: 'mcq',
+      question: 'ترجمهٔ صحیح کدام‌یک از آیات زیر در این درس آمده است؟',
+      options: [verse2.translation, 'ترجمهٔ نامرتبط اول', 'ترجمهٔ نامرتبط دوم', 'ترجمهٔ نامرتبط سوم'],
+      answer: verse2.translation
+    },
+    {
+      type: 'mcq',
+      question: 'کدام‌یک از موارد زیر جزو فعالیت‌های این درس نیست؟',
+      options: ['نقاشی آزاد', 'درک معنا (فعالیت ۱)', 'تلاوت (فعالیت ۲)', 'تدبر (فعالیت ۳)'],
+      answer: 'نقاشی آزاد'
+    }
+  ].filter(Boolean)
+
+  const shortQuestions = [
     {
       type: 'short',
       question: act1?.prompt || 'به نظر شما پیام اصلی این درس چیست؟',
@@ -36,8 +54,25 @@ export function generateMockQuiz(lesson) {
       type: 'short',
       question: act3?.prompt || 'یک نمونهٔ عملی از زندگی خودتان مرتبط با این درس بنویسید.',
       answer: 'هر پاسخ مرتبط و متناسب با موضوع درس قابل قبول است.'
+    },
+    {
+      type: 'short',
+      question: 'خلاصه‌ای از راهنمای تلاوت (فعالیت ۲) این درس را در چند جمله بنویسید.',
+      answer: act2?.instruction || 'پاسخ باید نکات اصلی تمرین قرائت این درس را بازگو کند.'
+    },
+    {
+      type: 'short',
+      question: 'یکی از آیات این درس را همراه با معنای آن توضیح دهید.',
+      answer: verse ? `${verse.arabic} — ${verse.translation}` : 'پاسخ باید به یکی از آیات درس و معنای آن اشاره کند.'
+    },
+    {
+      type: 'short',
+      question: 'چرا انس روزانه با قرآن اهمیت دارد؟ نظر خود را بنویسید.',
+      answer: lesson.dailyReading || 'پاسخ باید دربارهٔ اهمیت تلاوت و انس روزانه با قرآن باشد.'
     }
-  ].filter(Boolean)
+  ]
+
+  const questions = [...mcqQuestions.slice(0, 5), ...shortQuestions.slice(0, 5)]
 
   return { quiz_id: `mock_${lesson.id}`, questions }
 }
