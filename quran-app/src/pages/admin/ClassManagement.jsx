@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Papa from 'papaparse'
 import { Users, TrendingUp, Upload, Download, CheckCircle2, XCircle } from 'lucide-react'
 import { toPersianDigits } from '../../components/layout/Header.jsx'
 import { mockAdminClasses } from '../../lib/adminMockData.js'
+import { fetchClasses } from '../../lib/classesApi.js'
 import { bulkImportStudents } from '../../lib/api.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
@@ -14,8 +15,29 @@ export default function ClassManagement() {
   const fileInputsRef = useRef({})
   const { showToast } = useToast()
 
+  // در بارگذاری صفحه، فهرست واقعی کلاس‌ها از Supabase واکشی می‌شود (در نبود
+  // بک‌اند واقعی، همان ۱۲ کلاس نمونهٔ محلی به‌عنوان fallback باقی می‌ماند).
+  useEffect(() => {
+    let cancelled = false
+    fetchClasses().then(({ data, error }) => {
+      if (cancelled || error || !data || data.length === 0) return
+      setClasses(
+        data.map((c) => ({
+          ...c,
+          teacherName: c.teacher_id ? 'تخصیص‌داده‌شده' : 'بدون معلم',
+          studentCount: 0,
+          avgScore: 0
+        }))
+      )
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   function reassignTeacher(classId, teacherName) {
-    // TODO: در نسخهٔ نهایی، به‌روزرسانی ستون teacher_id در جدول classes
+    // TODO: تخصیص واقعی معلم نیاز به شناسهٔ ردیف teachers (نه profiles) دارد؛
+    // فعلاً فقط به‌صورت نمایشی/محلی به‌روزرسانی می‌شود
     setClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, teacherName } : c)))
   }
 
