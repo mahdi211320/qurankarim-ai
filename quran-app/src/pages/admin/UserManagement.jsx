@@ -5,6 +5,7 @@ import Papa from 'papaparse'
 import { toPersianDigits } from '../../components/layout/Header.jsx'
 import { mockUsers as initialUsers, mockAdminClasses } from '../../lib/adminMockData.js'
 import { bulkImportStudents, listAdminUsers, createAdminUser, deleteAdminUser } from '../../lib/api.js'
+import { fetchClasses } from '../../lib/classesApi.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
 const ROLE_TABS = [
@@ -17,6 +18,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState(initialUsers)
   const [isRealData, setIsRealData] = useState(false)
   const [loadingUsers, setLoadingUsers] = useState(false)
+  const [classes, setClasses] = useState(mockAdminClasses)
   const [activeRole, setActiveRole] = useState('student')
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(new Set())
@@ -26,6 +28,20 @@ export default function UserManagement() {
   const [importResult, setImportResult] = useState(null)
   const fileInputRef = useRef(null)
   const { showToast } = useToast()
+
+  // در بارگذاری صفحه، فهرست واقعی کلاس‌ها از Supabase واکشی می‌شود (در نبود
+  // بک‌اند واقعی، همان ۱۲ کلاس نمونهٔ محلی به‌عنوان fallback باقی می‌ماند).
+  useEffect(() => {
+    let cancelled = false
+    fetchClasses().then(({ data, error }) => {
+      if (cancelled || error || !data || data.length === 0) return
+      setClasses(data.map((c) => ({ ...c, class_name: c.class_name })))
+      setImportClassId((prev) => (data.some((c) => c.id === prev) ? prev : data[0].id))
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // در بارگذاری هر تب نقش، فهرست واقعی کاربران از Supabase واکشی می‌شود.
   // در نبود بک‌اند واقعی، همان لیست نمونهٔ محلی به‌عنوان fallback باقی می‌ماند.
@@ -221,7 +237,7 @@ export default function UserManagement() {
               onChange={(e) => setImportClassId(e.target.value)}
               className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             >
-              {mockAdminClasses.map((c) => (
+              {classes.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.class_name}
                 </option>
@@ -341,19 +357,25 @@ export default function UserManagement() {
         </table>
       </div>
 
-      <AddUserModal open={modalOpen} onClose={() => setModalOpen(false)} onAdd={addUser} defaultRole={activeRole} />
+      <AddUserModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onAdd={addUser}
+        defaultRole={activeRole}
+        classes={classes}
+      />
     </div>
   )
 }
 
-function AddUserModal({ open, onClose, onAdd, defaultRole }) {
+function AddUserModal({ open, onClose, onAdd, defaultRole, classes }) {
   const [fullName, setFullName] = useState('')
   const [role, setRole] = useState(defaultRole)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nationalId, setNationalId] = useState('')
   const [studentCode, setStudentCode] = useState('')
-  const [classId, setClassId] = useState(mockAdminClasses[0]?.id || '')
+  const [classId, setClassId] = useState(classes[0]?.id || '')
   const [saving, setSaving] = useState(false)
 
   async function handleSubmit(e) {
@@ -453,7 +475,7 @@ function AddUserModal({ open, onClose, onAdd, defaultRole }) {
                     onChange={(e) => setClassId(e.target.value)}
                     className="rounded-xl border border-paper-soft bg-paper px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
                   >
-                    {mockAdminClasses.map((c) => (
+                    {classes.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.class_name}
                       </option>
