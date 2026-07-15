@@ -3,42 +3,57 @@ import Papa from 'papaparse'
 import { Users, TrendingUp, Upload, Download, CheckCircle2, XCircle } from 'lucide-react'
 import { toPersianDigits } from '../../components/layout/Header.jsx'
 import { mockAdminClasses } from '../../lib/adminMockData.js'
-import { fetchClasses } from '../../lib/classesApi.js'
-import { bulkImportStudents } from '../../lib/api.js'
+import { fetchClasses, assignClassTeacher } from '../../lib/classesApi.js'
+import { bulkImportStudents, listAdminUsers } from '../../lib/api.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
-const TEACHERS = ['خانم رضایی', 'آقای موسوی']
+const FALLBACK_TEACHERS = [
+  { teacher_row_id: 't_mock_1', full_name: 'خانم رضایی' },
+  { teacher_row_id: 't_mock_2', full_name: 'آقای موسوی' }
+]
 
 export default function ClassManagement() {
-  const [classes, setClasses] = useState(mockAdminClasses)
+  const [classes, setClasses] = useState(mockAdminClasses.map((c) => ({ ...c, teacher_id: null })))
+  const [teachers, setTeachers] = useState(FALLBACK_TEACHERS)
+  const [isRealData, setIsRealData] = useState(false)
   const [importState, setImportState] = useState({}) // { [classId]: { importing, result } }
   const fileInputsRef = useRef({})
   const { showToast } = useToast()
 
-  // در بارگذاری صفحه، فهرست واقعی کلاس‌ها از Supabase واکشی می‌شود (در نبود
-  // بک‌اند واقعی، همان ۱۲ کلاس نمونهٔ محلی به‌عنوان fallback باقی می‌ماند).
+  // در بارگذاری صفحه، فهرست واقعی کلاس‌ها و معلم‌های واقعی از Supabase واکشی می‌شود
+  // (در نبود بک‌اند واقعی، همان دادهٔ نمونهٔ محلی به‌عنوان fallback باقی می‌ماند).
   useEffect(() => {
     let cancelled = false
+
     fetchClasses().then(({ data, error }) => {
       if (cancelled || error || !data || data.length === 0) return
-      setClasses(
-        data.map((c) => ({
-          ...c,
-          teacherName: c.teacher_id ? 'تخصیص‌داده‌شده' : 'بدون معلم',
-          studentCount: 0,
-          avgScore: 0
-        }))
-      )
+      setIsRealData(true)
+      setClasses(data.map((c) => ({ ...c, studentCount: 0, avgScore: 0 })))
     })
+
+    listAdminUsers('teacher').then(({ data, error }) => {
+      if (cancelled || error || !data?.users) return
+      const realTeachers = data.users
+        .filter((t) => t.teacher_row_id)
+        .map((t) => ({ teacher_row_id: t.teacher_row_id, full_name: t.full_name }))
+      if (realTeachers.length > 0) setTeachers(realTeachers)
+    })
+
     return () => {
       cancelled = true
     }
   }, [])
 
-  function reassignTeacher(classId, teacherName) {
-    // TODO: تخصیص واقعی معلم نیاز به شناسهٔ ردیف teachers (نه profiles) دارد؛
-    // فعلاً فقط به‌صورت نمایشی/محلی به‌روزرسانی می‌شود
-    setClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, teacherName } : c)))
+  async function reassignTeacher(classId, teacherRowId) {
+    if (isRealData) {
+      const { error } = await assignClassTeacher(classId, teacherRowId)
+      if (error) {
+        showToast('تخصیص معلم ناموفق بود.', 'error')
+        return
+      }
+    }
+    setClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, teacher_id: teacherRowId } : c)))
+    showToast('معلم کلاس به‌روزرسانی شد.')
   }
 
   function downloadSampleCsv() {
@@ -131,14 +146,15 @@ export default function ClassManagement() {
               <label className="flex flex-col gap-1 text-xs text-ink-faint">
                 معلم مسئول
                 <select
-                  value={c.teacherName}
+                  value={c.teacher_id || ''}
                   onChange={(e) => reassignTeacher(c.id, e.target.value)}
                   className="rounded-lg border border-paper-soft bg-paper px-2.5 py-2 text-sm text-ink
                              focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 >
-                  {TEACHERS.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
+                  <option value="">بدون معلم</option>
+                  {teachers.map((t) => (
+                    <option key={t.teacher_row_id} value={t.teacher_row_id}>
+                      {t.full_name}
                     </option>
                   ))}
                 </select>

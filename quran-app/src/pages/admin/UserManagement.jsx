@@ -107,12 +107,13 @@ export default function UserManagement() {
       // بدون بک‌اند واقعی، فقط به‌صورت محلی/نمایشی اضافه می‌شود
       setUsers((prev) => [...prev, { id: `u_new_${prev.length + 1}`, ...newUser }])
       showToast(`«${newUser.full_name}» فقط به‌صورت محلی اضافه شد (Supabase وصل نیست).`, 'error')
+      setActiveRole(newUser.role)
       return
     }
 
     const { data, error } = await createAdminUser(newUser)
     if (error || !data) {
-      showToast('ساخت کاربر واقعی ناموفق بود.', 'error')
+      showToast('ساخت کاربر واقعی ناموفق بود. لطفاً دوباره تلاش نکنید تا از ثبت تکراری جلوگیری شود.', 'error')
       return
     }
     setUsers((prev) => [
@@ -126,6 +127,8 @@ export default function UserManagement() {
       }
     ])
     showToast(`«${newUser.full_name}» با موفقیت افزوده شد.`)
+    // خودکار به تب همان نقش برو تا کاربر فوراً نتیجه را ببیند (و دوباره ارسال نکند)
+    setActiveRole(newUser.role)
   }
 
   function downloadSampleCsv() {
