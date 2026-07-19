@@ -8,144 +8,89 @@ export const mockStudent = {
   class_name: 'هفتم - الف'
 }
 
-// درس‌های ترم اول پایه هفتم (طبق کتاب «آموزش قرآن» - دورهٔ اول متوسطه)
-// توجه: عناوین دروس مطابق فهرست کتاب رسمی است. محتوای کامل (متن قرآن و فعالیت‌ها)
-// فقط برای درس ۱ به‌عنوان نمونهٔ کامل نوشته شده؛ بقیهٔ دروس بعداً توسط ادمین از
-// طریق پنل مدیریت محتوا تکمیل می‌شوند (به همین دلیل «verses» آن‌ها خالی است).
+// درس‌های همهٔ پایه‌ها (طبق کتاب «آموزش قرآن» - دورهٔ اول متوسطه)
+// نکتهٔ مهم: هر درس رسمی کتاب به ۲ بخش (بخش اول/دوم) با متن قرآن و فعالیت‌های
+// جداگانه تقسیم می‌شود؛ برای همین هر درس رسمی، ۲ ردیف جداگانه در این آرایه دارد.
+// عناوین مطابق فهرست کتاب رسمی است. محتوای کامل (متن قرآن/فعالیت‌ها) توسط ادمین
+// از طریق پنل مدیریت دروس تکمیل می‌شود (به همین دلیل «verses» همه خالی است).
 export const mockLessons = [
-  {
-    id: 'l7_1',
-    grade_level: 7,
-    lesson_number: 1,
-    title: 'سوره یوسف - بخش اول',
-    is_term1_limited: true,
-    verses: [
-      {
-        arabic: 'الٓر ۚ تِلْكَ آيَاتُ الْكِتَابِ الْمُبِينِ',
-        translation: 'الف، لام، را؛ این است نشانه‌های کتابی روشنگر.'
-      },
-      {
-        arabic: 'إِنَّا أَنزَلْنَاهُ قُرْآنًا عَرَبِيًّا لَّعَلَّكُمْ تَعْقِلُونَ',
-        translation: 'ما آن را قرآنی به زبان عربی فرو فرستادیم، باشد که بیندیشید.'
-      },
-      {
-        arabic: 'نَحْنُ نَقُصُّ عَلَيْكَ أَحْسَنَ الْقَصَصِ بِمَا أَوْحَيْنَا إِلَيْكَ هَـٰذَا الْقُرْآنَ',
-        translation: 'ما بهترین داستان را با وحی‌کردنِ همین قرآن بر تو بازگو می‌کنیم.'
-      }
-    ],
-    activities: {
-      act1: {
-        prompt:
-          'به نظر شما چرا خداوند داستان حضرت یوسف را «أحسن القصص» (بهترین داستان) نامیده است؟ با توجه به معنای آیات، پاسخ خود را در چند جمله بنویسید.',
-        placeholder: 'پاسخ خود را اینجا بنویسید...',
-        explanation:
-          'داستان حضرت یوسف به دلیل دربرداشتن درس‌های اخلاقی فراوان (صبر، امید، گذشت) و ساختار داستانی کامل، «بهترین داستان» نامیده شده است.'
-      },
-      act2: {
-        instruction:
-          'آیات فوق را با رعایت مخارج حروف و مدّهای لازم چند بار تمرین کنید، سپس صدای خود را ضبط کنید.'
-      },
-      act3: {
-        prompt:
-          'این ویژگیِ «بهترین داستان‌بودن» چه پیامی برای زندگی امروز ما دارد؟ یک نمونهٔ عملی از زندگی خودتان بنویسید.',
-        placeholder: 'تدبر خود را اینجا بنویسید...'
-      }
-    },
-    dailyReading:
-      'تلاوت آیات ۱ تا ۳ سورهٔ یوسف را همراه با ترجمه، پیش از خواب یک بار برای اعضای خانواده بخوانید.'
-  },
-  {
-    id: 'l7_2',
-    grade_level: 7,
-    lesson_number: 2,
-    title: 'هرچه کنی به خود کنی',
-    is_term1_limited: true,
-    verses: [],
-    activities: {},
-    dailyReading: ''
-  },
-  {
-    id: 'l7_3',
-    grade_level: 7,
-    lesson_number: 3,
-    title: 'با توکّل زانوی اشتر ببند',
-    is_term1_limited: true,
-    verses: [],
-    activities: {},
-    dailyReading: ''
-  },
-  {
-    id: 'l7_4',
-    grade_level: 7,
-    lesson_number: 4,
-    title: 'تو نیکی می‌کن و در دجله انداز',
-    is_term1_limited: true,
-    verses: [],
-    activities: {},
-    dailyReading: ''
-  },
-  {
-    id: 'l7_5',
-    grade_level: 7,
-    lesson_number: 5,
-    title: 'ای نمازم همه تو، راز و نیازم همه تو',
-    is_term1_limited: true,
-    verses: [],
-    activities: {},
-    dailyReading: ''
-  },
-  {
-    id: 'l7_6',
-    grade_level: 7,
-    lesson_number: 6,
-    title: 'همه از بهر تو سرگشته و فرمان‌بردار',
-    is_term1_limited: true,
-    verses: [],
-    activities: {},
-    dailyReading: ''
-  },
+// پایه هفتم - هر درس به ۲ بخش تقسیم می‌شود (۱۲ درس × ۲ بخش = ۲۴ محتوا)
+  { id: 'l7_1', grade_level: 7, lesson_number: 1, title: 'ابر و باد و مه و خورشید و فلک در کارند — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_2', grade_level: 7, lesson_number: 2, title: 'ابر و باد و مه و خورشید و فلک در کارند — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_3', grade_level: 7, lesson_number: 3, title: 'هرچه کنی به خود کنی — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_4', grade_level: 7, lesson_number: 4, title: 'هرچه کنی به خود کنی — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_5', grade_level: 7, lesson_number: 5, title: 'با توکّل زانوی اشتر ببند — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_6', grade_level: 7, lesson_number: 6, title: 'با توکّل زانوی اشتر ببند — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_7', grade_level: 7, lesson_number: 7, title: 'تو نیکی می‌کن و در دجله انداز — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_8', grade_level: 7, lesson_number: 8, title: 'تو نیکی می‌کن و در دجله انداز — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_9', grade_level: 7, lesson_number: 9, title: 'ای نمازم همه تو، راز و نیازم همه تو — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_10', grade_level: 7, lesson_number: 10, title: 'ای نمازم همه تو، راز و نیازم همه تو — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_11', grade_level: 7, lesson_number: 11, title: 'همه از بهر تو سرگشته و فرمان‌بردار — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_12', grade_level: 7, lesson_number: 12, title: 'همه از بهر تو سرگشته و فرمان‌بردار — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_13', grade_level: 7, lesson_number: 13, title: 'قرآن که پیام آسمانی است، روشنگر راه زندگانی است — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_14', grade_level: 7, lesson_number: 14, title: 'قرآن که پیام آسمانی است، روشنگر راه زندگانی است — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_15', grade_level: 7, lesson_number: 15, title: 'ندایی در زمین و آسمان است که این دنیا برای امتحان است — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_16', grade_level: 7, lesson_number: 16, title: 'ندایی در زمین و آسمان است که این دنیا برای امتحان است — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_17', grade_level: 7, lesson_number: 17, title: 'اگر مشتاق دیدار خدایی، عمل شایسته‌تر تا می‌توانی — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_18', grade_level: 7, lesson_number: 18, title: 'اگر مشتاق دیدار خدایی، عمل شایسته‌تر تا می‌توانی — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_19', grade_level: 7, lesson_number: 19, title: 'این خانه با نماز و دعا خو گرفته است — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_20', grade_level: 7, lesson_number: 20, title: 'این خانه با نماز و دعا خو گرفته است — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_21', grade_level: 7, lesson_number: 21, title: 'چو یونس از خدا باید طلب کرد — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_22', grade_level: 7, lesson_number: 22, title: 'چو یونس از خدا باید طلب کرد — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_23', grade_level: 7, lesson_number: 23, title: 'ولایت خدا بود تو را نصیر و رهنما — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l7_24', grade_level: 7, lesson_number: 24, title: 'ولایت خدا بود تو را نصیر و رهنما — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
 
-  // پایه هفتم - ترم دوم (دروس ۷ تا ۱۲) - کتاب هفتم جمعاً ۱۲ درس دارد
-  { id: 'l7_7', grade_level: 7, lesson_number: 7, title: 'قرآن که پیام آسمانی است، روشنگر راه زندگانی است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l7_8', grade_level: 7, lesson_number: 8, title: 'ندایی در زمین و آسمان است که این دنیا برای امتحان است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l7_9', grade_level: 7, lesson_number: 9, title: 'اگر مشتاق دیدار خدایی، عمل شایسته‌تر تا می‌توانی', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l7_10', grade_level: 7, lesson_number: 10, title: 'این خانه با نماز و دعا خو گرفته است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l7_11', grade_level: 7, lesson_number: 11, title: 'چو یونس از خدا باید طلب کرد', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l7_12', grade_level: 7, lesson_number: 12, title: 'ولایت خدا بود تو را نصیر و رهنما', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+// پایه هشتم - هر درس به ۲ بخش تقسیم می‌شود (۱۲ درس × ۲ بخش = ۲۴ محتوا)
+  { id: 'l8_1', grade_level: 8, lesson_number: 1, title: 'رستگاری در صلاة است و زکات — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_2', grade_level: 8, lesson_number: 2, title: 'رستگاری در صلاة است و زکات — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_3', grade_level: 8, lesson_number: 3, title: 'باد و خاک و آب و آتش بنده‌اند — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_4', grade_level: 8, lesson_number: 4, title: 'باد و خاک و آب و آتش بنده‌اند — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_5', grade_level: 8, lesson_number: 5, title: 'همه عالم جمال طلعت اوست — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_6', grade_level: 8, lesson_number: 6, title: 'همه عالم جمال طلعت اوست — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_7', grade_level: 8, lesson_number: 7, title: 'چون سلیمان از خدا حاجت بخواه — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_8', grade_level: 8, lesson_number: 8, title: 'چون سلیمان از خدا حاجت بخواه — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_9', grade_level: 8, lesson_number: 9, title: 'ای وارث پیمبر و قرآن و دین بیا — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_10', grade_level: 8, lesson_number: 10, title: 'ای وارث پیمبر و قرآن و دین بیا — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_11', grade_level: 8, lesson_number: 11, title: 'معبودهای باطل چون تار عنکبوت‌اند — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_12', grade_level: 8, lesson_number: 12, title: 'معبودهای باطل چون تار عنکبوت‌اند — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_13', grade_level: 8, lesson_number: 13, title: 'هر روزِ عمر مشق کن این شعر ناب را — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_14', grade_level: 8, lesson_number: 14, title: 'هر روزِ عمر مشق کن این شعر ناب را — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_15', grade_level: 8, lesson_number: 15, title: 'راهرو گر صد هنر دارد، توکل بایدش — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_16', grade_level: 8, lesson_number: 16, title: 'راهرو گر صد هنر دارد، توکل بایدش — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_17', grade_level: 8, lesson_number: 17, title: 'کدام دانه فرو رفت در زمین که نرست؟ — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_18', grade_level: 8, lesson_number: 18, title: 'کدام دانه فرو رفت در زمین که نرست؟ — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_19', grade_level: 8, lesson_number: 19, title: 'دستور خدا، سلام برتوست — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_20', grade_level: 8, lesson_number: 20, title: 'دستور خدا، سلام برتوست — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_21', grade_level: 8, lesson_number: 21, title: 'همنشین تو از تو به باشد — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_22', grade_level: 8, lesson_number: 22, title: 'همنشین تو از تو به باشد — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_23', grade_level: 8, lesson_number: 23, title: 'یا غافر الخطایا! دریاب بی‌نوا را — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l8_24', grade_level: 8, lesson_number: 24, title: 'یا غافر الخطایا! دریاب بی‌نوا را — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
 
-  // پایه هشتم - ترم اول (دروس ۱ تا ۶) - عناوین مطابق فهرست کتاب رسمی
-  { id: 'l8_1', grade_level: 8, lesson_number: 1, title: 'رستگاری در صلاة است و زکات', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_2', grade_level: 8, lesson_number: 2, title: 'باد و خاک و آب و آتش بنده‌اند', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_3', grade_level: 8, lesson_number: 3, title: 'همه عالم جمال طلعت اوست', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_4', grade_level: 8, lesson_number: 4, title: 'چون سلیمان از خدا حاجت بخواه', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_5', grade_level: 8, lesson_number: 5, title: 'ای وارث پیمبر و قرآن و دین بیا', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_6', grade_level: 8, lesson_number: 6, title: 'معبودهای باطل چون تار عنکبوت‌اند', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-
-  // پایه هشتم - ترم دوم (دروس ۷ تا ۱۲) - کتاب هشتم جمعاً ۱۲ درس دارد
-  { id: 'l8_7', grade_level: 8, lesson_number: 7, title: 'هر روزِ عمر مشق کن این شعر ناب را', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_8', grade_level: 8, lesson_number: 8, title: 'راهرو گر صد هنر دارد، توکل بایدش', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_9', grade_level: 8, lesson_number: 9, title: 'کدام دانه فرو رفت در زمین که نرست؟', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_10', grade_level: 8, lesson_number: 10, title: 'دستور خدا، سلام برتوست', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_11', grade_level: 8, lesson_number: 11, title: 'همنشین تو از تو به باشد', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l8_12', grade_level: 8, lesson_number: 12, title: 'یا غافر الخطایا! دریاب بی‌نوا را', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-
-  // پایه نهم - ترم اول (دروس ۱ تا ۵)
-  { id: 'l9_1', grade_level: 9, lesson_number: 1, title: 'این جهان راه است و ما راهی', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_2', grade_level: 9, lesson_number: 2, title: 'روشنگر راه سعادت چو خورشید فروزان است قرآن', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_3', grade_level: 9, lesson_number: 3, title: 'در صراط مستقیم ای دل کسی گمراه نیست', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_4', grade_level: 9, lesson_number: 4, title: 'یک میوه از درخت غرور، آن تمسخر است', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_5', grade_level: 9, lesson_number: 5, title: 'بهشتِ حق، جزای متقین است', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
-
-  // پایه نهم - ترم دوم (دروس ۶ تا ۱۱) - کتاب نهم جمعاً ۱۱ درس دارد
-  { id: 'l9_6', grade_level: 9, lesson_number: 6, title: 'عدالت‌خواه و عادل چون خدا باش', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_7', grade_level: 9, lesson_number: 7, title: 'خدا با حکمت و میزان، رسولان را دهد یاری', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_8', grade_level: 9, lesson_number: 8, title: 'تجارت با خدا، کسبی است پرسود', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_9', grade_level: 9, lesson_number: 9, title: 'سفر زندگی ما ز خدا تا به خداست', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_10', grade_level: 9, lesson_number: 10, title: 'رتل القرآن ترتیلاً، ندای رحمت است', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
-  { id: 'l9_11', grade_level: 9, lesson_number: 11, title: 'به آسمان و کوه‌ها چرا نظر نمی‌کنی؟!', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' }
+// پایه نهم - هر درس به ۲ بخش تقسیم می‌شود (۱۱ درس × ۲ بخش = ۲۲ محتوا)
+  { id: 'l9_1', grade_level: 9, lesson_number: 1, title: 'این جهان راه است و ما راهی — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_2', grade_level: 9, lesson_number: 2, title: 'این جهان راه است و ما راهی — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_3', grade_level: 9, lesson_number: 3, title: 'روشنگر راه سعادت چو خورشید فروزان است قرآن — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_4', grade_level: 9, lesson_number: 4, title: 'روشنگر راه سعادت چو خورشید فروزان است قرآن — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_5', grade_level: 9, lesson_number: 5, title: 'در صراط مستقیم ای دل کسی گمراه نیست — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_6', grade_level: 9, lesson_number: 6, title: 'در صراط مستقیم ای دل کسی گمراه نیست — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_7', grade_level: 9, lesson_number: 7, title: 'یک میوه از درخت غرور، آن تمسخر است — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_8', grade_level: 9, lesson_number: 8, title: 'یک میوه از درخت غرور، آن تمسخر است — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_9', grade_level: 9, lesson_number: 9, title: 'بهشتِ حق، جزای متقین است — بخش اول', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_10', grade_level: 9, lesson_number: 10, title: 'بهشتِ حق، جزای متقین است — بخش دوم', is_term1_limited: true, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_11', grade_level: 9, lesson_number: 11, title: 'عدالت‌خواه و عادل چون خدا باش — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_12', grade_level: 9, lesson_number: 12, title: 'عدالت‌خواه و عادل چون خدا باش — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_13', grade_level: 9, lesson_number: 13, title: 'خدا با حکمت و میزان، رسولان را دهد یاری — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_14', grade_level: 9, lesson_number: 14, title: 'خدا با حکمت و میزان، رسولان را دهد یاری — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_15', grade_level: 9, lesson_number: 15, title: 'تجارت با خدا، کسبی است پرسود — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_16', grade_level: 9, lesson_number: 16, title: 'تجارت با خدا، کسبی است پرسود — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_17', grade_level: 9, lesson_number: 17, title: 'سفر زندگی ما ز خدا تا به خداست — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_18', grade_level: 9, lesson_number: 18, title: 'سفر زندگی ما ز خدا تا به خداست — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_19', grade_level: 9, lesson_number: 19, title: 'رتل القرآن ترتیلاً، ندای رحمت است — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_20', grade_level: 9, lesson_number: 20, title: 'رتل القرآن ترتیلاً، ندای رحمت است — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_21', grade_level: 9, lesson_number: 21, title: 'به آسمان و کوه‌ها چرا نظر نمی‌کنی؟! — بخش اول', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
+  { id: 'l9_22', grade_level: 9, lesson_number: 22, title: 'به آسمان و کوه‌ها چرا نظر نمی‌کنی؟! — بخش دوم', is_term1_limited: false, verses: [], activities: {}, dailyReading: '' },
 ]
 
-// نشان‌شده‌ها (bookmarks) - نمونه: درس ۱ نشان‌شده است
 export const mockBookmarks = new Set(['l7_1'])
 
 // جمله‌های انگیزشی برگرفته از مضمون آیات قرآن، برای نمایش روزانه در داشبورد
@@ -184,10 +129,11 @@ export const mockProgress = {
  * منطق قفل توالی دروس:
  * - درس شماره ۱ همیشه باز است.
  * - درس N+1 فقط زمانی باز می‌شود که هر سه فعالیت درس N انجام شده باشد (is_completed).
- * - محدودیت ترم اول: پایه هفتم و هشتم فقط دروس ۱ تا ۶، پایه نهم فقط دروس ۱ تا ۵.
+ * - محدودیت ترم اول: چون هر درس رسمی به ۲ بخش تقسیم شده، محدودیت‌ها نیز دو برابر شده‌اند:
+ *   پایه هفتم و هشتم تا بخش ۱۲ (یعنی ۶ درس رسمی اول)، پایه نهم تا بخش ۱۰ (یعنی ۵ درس رسمی اول).
  */
 export function getTermLimit(gradeLevel) {
-  return gradeLevel === 9 ? 5 : 6
+  return gradeLevel === 9 ? 10 : 12
 }
 
 export function getLessonsByGrade(lessons, gradeLevel) {
