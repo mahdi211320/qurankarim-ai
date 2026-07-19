@@ -1,14 +1,15 @@
 // Edge Function: process-recitation
 // ورودی:  { audio_path: string, lesson_id: string, student_id: string, duration_seconds?: number }
 //   audio_path مسیر فایلی است که فرانت‌اند از قبل در باکت Storage به نام «recitations» آپلود کرده.
-// خروجی:  { similarity_score: number, feedback: string, transcript: string }
+// خروجی:  { similarity_score: number, feedback: string, transcript: string, mistakes: [...] }
 //
-// مراحل: دانلود فایل از Storage → رونویسی با Whisper → مقایسهٔ متن با آیات اصلی درس →
-// ذخیره در audio_recordings → به‌روزرسانی student_progress.recitation_score
+// مراحل: دانلود فایل از Storage → رونویسی با Whisper → تراز کلمه‌به‌کلمه با آیات اصلی درس
+// (تا دقیقاً مشخص شود کدام کلمه اشتباه/جاافتاده/اضافه بوده) → ذخیره در audio_recordings →
+// به‌روزرسانی student_progress.recitation_score
 
 import { handleOptions, jsonResponse, errorResponse } from '../_shared/cors.ts'
 import { createUserClient } from '../_shared/supabaseClients.ts'
-import { calculateSimilarityScore, feedbackForScore } from '../_shared/similarity.ts'
+import { calculateSimilarityScore, findWordMistakes, buildRecitationFeedback } from '../_shared/similarity.ts'
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')!
 
@@ -61,7 +62,8 @@ Deno.serve(async (req) => {
     const transcript: string = whisperData.text ?? ''
 
     const similarityScore = calculateSimilarityScore(lesson.quran_text_arabic, transcript)
-    const feedback = feedbackForScore(similarityScore)
+    const mistakes = findWordMistakes(lesson.quran_text_arabic, transcript)
+    const feedback = buildRecitationFeedback(similarityScore, mistakes)
 
     const { data: publicUrlData } = supabase.storage.from('recitations').getPublicUrl(audio_path)
 
@@ -87,7 +89,7 @@ Deno.serve(async (req) => {
         { onConflict: 'student_id,lesson_id' }
       )
 
-    return jsonResponse({ similarity_score: similarityScore, feedback, transcript })
+    return jsonResponse({ similarity_score: similarityScore, feedback, transcript, mistakes })
   } catch (err) {
     return errorResponse('خطای غیرمنتظره در پردازش تلاوت.', 500, String(err))
   }
